@@ -664,15 +664,17 @@ class Cell(object):
 
         x0, y0, x1, y1 = self.box
 
-        donor_img = image_manager.donor_image[x0:x1+1, y0:y1+1]
+        phase_img = image_manager.phase_image[x0:x1+1, y0:y1+1]
+        phase_img = gray2rgb(img_as_float(phase_img))
+        donor_img = rescale_intensity(image_manager.donor_image)[x0:x1+1, y0:y1+1]
         donor_img = gray2rgb(img_as_float(donor_img))
-        acceptor_img = image_manager.acceptor_image[x0:x1+1, y0:y1+1]
+        acceptor_img = rescale_intensity(image_manager.acceptor_image)[x0:x1+1, y0:y1+1]
         acceptor_img = gray2rgb(img_as_float(acceptor_img))
 
-        cell_masks = np.concatenate((self.cell_mask, self.cell_mask), axis=1)
-        septum_masks = np.concatenate((self.sept_mask, self.sept_mask), axis=1)
+        cell_masks = np.concatenate((self.cell_mask, self.cell_mask, self.cell_mask), axis=1)
+        septum_masks = np.concatenate((self.sept_mask, self.sept_mask, self.sept_mask), axis=1)
 
-        no_mask = rescale_intensity(np.concatenate((donor_img, acceptor_img), axis=1))
+        no_mask = np.concatenate((phase_img, donor_img, acceptor_img), axis=1)
         with_masks = mark_boundaries(no_mask, img_as_uint(cell_masks), color=(0, 0, 1), outline_color=None)
         with_masks = mark_boundaries(with_masks, img_as_uint(septum_masks), color=(1, 0, 0), outline_color=None)
         img = np.concatenate((no_mask, with_masks), axis=0)

@@ -9,11 +9,6 @@ class PyFRET(object):
     def process_control(self):
         pass
 
-    def import_g(self):
-        value = 0  # TODO
-
-        self.sets["Experiment"].fret_manager.fret_g = value
-
     def process_experiment(self):
         # TODO create heatmap of E on this step
         pass

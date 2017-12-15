@@ -64,7 +64,7 @@ class CellPicker(object):
 
         self.se_wt_button = tk.Button(self.septum_frame, text="wt (A)", command=lambda: self.select_channel("wt", True))
         self.se_wt_button.pack(side="left")
-        
+
         self.se_donor_button = tk.Button(self.septum_frame, text="Donor (S)", command=lambda: self.select_channel("donor", True))
         self.se_donor_button.pack(side="left")
 
@@ -93,11 +93,11 @@ class CellPicker(object):
         plt.subplots_adjust(left=0, bottom=0, right=1, top=1)
         self.ax.axis("off")
         plt.autoscale(False)
-        
+
         self.toolbar = NavigationToolbar2TkAgg(self.canvas, self.middle_frame)
         self.toolbar.update()
         self.canvas._tkcanvas.pack(fill="both")
-        
+
         self.ax.format_coord = self.show_nothing
 
         self.main_window.bind("<Key>", self.key)
@@ -127,7 +127,7 @@ class CellPicker(object):
             self.previous_cell()
 
     def show_nothing(self, x, y):
-        
+
         return ""
 
     def previous_cell(self):
@@ -139,7 +139,7 @@ class CellPicker(object):
             pass
 
     def select_channel(self, channel, has_septum):
-        
+
         self.cells_manager.cells[self.cells_id[self.current_index]].channel = channel
         self.cells_manager.cells[self.cells_id[self.current_index]].has_septum = has_septum
 
@@ -148,13 +148,14 @@ class CellPicker(object):
             self.show_image()
 
         else:
-            if tkMessageBox.askokcancel("Quit", "Last cell, generate report?"):
+            if tkMessageBox.askokcancel("Quit", "Last cell, Proceed?"):
+                self.main_window.quit()
                 self.main_window.destroy()
             else:
                 self.show_image()
 
     def show_image(self):
-        
+
         self.ax.cla()
 
         current_image = self.cells_manager.cells[self.cells_id[self.current_index]].donacc_image
