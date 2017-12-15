@@ -43,7 +43,7 @@ class FRETManager(object):
     def compute_correction_factors(self, image_manager, cells_manager):
         pass
 
-    def compute_g(self, image_manager, cells_manager):
+    def compute_g(self, image_manager, cells_manager, E):
         pass
 
     def compute_fret_efficiency(self, image_manager, cells_manager):
