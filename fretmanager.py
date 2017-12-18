@@ -277,7 +277,8 @@ class FRETManager(object):
 
                 e = (Fc/self.fret_G) / (Idd+(Fc/self.fret_G))
                 e_values.append(e)
-                heatmap[ix] = e
+                x, y = ix
+                heatmap[x0+x, y0+y] = e
 
             if len(e_values) > 0:
                 cell_average_E.append(np.average(e_values))
@@ -311,7 +312,8 @@ class FRETManager(object):
 
                 e = (Fc/self.fret_G) / (Idd+(Fc/self.fret_G))
                 e_values.append(e)
-                heatmap[ix] = e
+                """x, y = ix
+                heatmap[x+x0, y+y0] = e"""
 
             if len(e_values) > 0:
                 septum_average_E.append(np.average(e_values))
