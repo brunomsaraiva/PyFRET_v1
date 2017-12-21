@@ -60,7 +60,7 @@ class ReportsManager(object):
 
                 if cell.channel == "both":
                     cellid = str(int(cell.label))
-                    img = img_as_float(cell.image)
+                    img = img_as_float(cell.image[:, 0:1+cell.image.shape[1]/2])
                     imsave(path + "/_fret_images" +
                            os.sep + cellid + '.png', img)
                     lin = '<tr><td>' + cellid + '</td><td><img src="./' + '_fret_images/' + \
@@ -77,7 +77,7 @@ class ReportsManager(object):
 
                 elif cell.channel == "donor":
                     cellid = str(int(cell.label))
-                    img = img_as_float(cell.image)
+                    img = img_as_float(cell.image[:, 0:1+cell.image.shape[1]/2])
                     imsave(path + "/_donor_images" +
                            os.sep + cellid + '.png', img)
                     lin = '<tr><td>' + cellid + '</td><td><img src="./' + '_donor_images/' + \
@@ -94,7 +94,7 @@ class ReportsManager(object):
 
                 elif cell.channel == "acceptor":
                     cellid = str(int(cell.label))
-                    img = img_as_float(cell.image)
+                    img = img_as_float(cell.image[:, 0:1+cell.image.shape[1]/2])
                     imsave(path + "/_acceptor_images" +
                            os.sep + cellid + '.png', img)
                     lin = '<tr><td>' + cellid + '</td><td><img src="./' + '_acceptor_images/' + \
@@ -111,7 +111,7 @@ class ReportsManager(object):
 
                 elif cell.channel == "wt":
                     cellid = str(int(cell.label))
-                    img = img_as_float(cell.image)
+                    img = img_as_float(cell.image[:, 0:1+cell.image.shape[1]/2])
                     imsave(path + "/_wt_images" +
                            os.sep + cellid + '.png', img)
                     lin = '<tr><td>' + cellid + '</td><td><img src="./' + '_wt_images/' + \
@@ -128,7 +128,7 @@ class ReportsManager(object):
 
                 elif cell.channel == "discard":
                     cellid = str(int(cell.label))
-                    img = img_as_float(cell.image)
+                    img = img_as_float(cell.image[:, 0:1+cell.image.shape[1]/2])
                     imsave(path + "/_discarded_images" +
                            os.sep + cellid + '.png', img)
                     lin = '<tr><td>' + cellid + '</td><td><img src="./' + '_discarded_images/' + \
@@ -154,7 +154,7 @@ class ReportsManager(object):
                 report.append("</table>\n")
             if len(wt) > 1:
                 report.extend(wt)
-                report.append("</table\n")
+                report.append("</table>\n")
             if len(discarded) > 1:
                 report.extend(discarded)
                 report.append("</table>\n")
@@ -184,7 +184,6 @@ class ReportsManager(object):
 
         g_report = "<h2>used G value: " + str(g_value) + "</h2>"
         report.extend(g_report)
-
         cell_e_report = "<h2>Average cell E value: " + str(cell_e) + "</h2>"
         report.extend(cell_e_report)
         septum_e_report = "<h2>Average septum E value: " + str(septum_e) + "</h2>"
@@ -213,7 +212,7 @@ class ReportsManager(object):
 
                 if cell.channel == "both":
                     cellid = str(int(cell.label))
-                    img = img_as_float(cell.image)
+                    img = img_as_float(cell.image[:, 0:1+cell.image.shape[1]/2])
                     imsave(path + "/_fret_images" +
                            os.sep + cellid + '.png', img)
                     lin = '<tr><td>' + cellid + '</td><td><img src="./' + '_fret_images/' + \
@@ -230,7 +229,7 @@ class ReportsManager(object):
 
                 elif cell.channel == "donor":
                     cellid = str(int(cell.label))
-                    img = img_as_float(cell.image)
+                    img = img_as_float(cell.image[:, 0:1+cell.image.shape[1]/2])
                     imsave(path + "/_donor_images" +
                            os.sep + cellid + '.png', img)
                     lin = '<tr><td>' + cellid + '</td><td><img src="./' + '_donor_images/' + \
@@ -247,7 +246,7 @@ class ReportsManager(object):
 
                 elif cell.channel == "acceptor":
                     cellid = str(int(cell.label))
-                    img = img_as_float(cell.image)
+                    img = img_as_float(cell.image[:, 0:1+cell.image.shape[1]/2])
                     imsave(path + "/_acceptor_images" +
                            os.sep + cellid + '.png', img)
                     lin = '<tr><td>' + cellid + '</td><td><img src="./' + '_acceptor_images/' + \
@@ -264,7 +263,7 @@ class ReportsManager(object):
 
                 elif cell.channel == "wt":
                     cellid = str(int(cell.label))
-                    img = img_as_float(cell.image)
+                    img = img_as_float(cell.image[:, 0:1+cell.image.shape[1]/2])
                     imsave(path + "/_wt_images" +
                            os.sep + cellid + '.png', img)
                     lin = '<tr><td>' + cellid + '</td><td><img src="./' + '_wt_images/' + \
@@ -279,9 +278,9 @@ class ReportsManager(object):
                     lin += '</td></tr>\n'
                     wt.append(lin)
 
-                elif cell.channel == "discarded":
+                elif cell.channel == "discard":
                     cellid = str(int(cell.label))
-                    img = img_as_float(cell.image)
+                    img = img_as_float(cell.image[:, 0:1+cell.image.shape[1]/2])
                     imsave(path + "/_discarded_images" +
                            os.sep + cellid + '.png', img)
                     lin = '<tr><td>' + cellid + '</td><td><img src="./' + '_discarded_images/' + \
@@ -307,7 +306,7 @@ class ReportsManager(object):
                 report.append("</table>\n")
             if len(wt) > 1:
                 report.extend(wt)
-                report.append("</table\n")
+                report.append("</table>\n")
             if len(discarded) > 1:
                 report.extend(discarded)
                 report.append("</table>\n")
@@ -348,4 +347,4 @@ class ReportsManager(object):
             if not os.path.exists(path + os.sep + "_discarded_images"):
                 os.makedirs(path + os.sep + "_discarded_images")
             self.generate_report_experiment(image_manager, cells_manager, fret_manager, path)
-            imsave(path + os.sep + "heatmap.tif", img_as_int(fret_manager.fret_heatmap))
+            imsave(path + os.sep + "heatmap.png", img_as_int(fret_manager.fret_heatmap))
