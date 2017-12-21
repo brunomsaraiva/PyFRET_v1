@@ -84,7 +84,7 @@ class CellPicker(object):
         self.number_of_cells_label.pack()
 
         # creates the figure canvas
-        self.fig = plt.figure(figsize=(12, 8), frameon=True)
+        self.fig = plt.figure(figsize=(10, 6), frameon=True)
         self.canvas = FigureCanvasTkAgg(self.fig, self.middle_frame)
         self.canvas.show()
         self.canvas.get_tk_widget().pack(side="top")

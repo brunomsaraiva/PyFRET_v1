@@ -1,5 +1,8 @@
 import numpy as np
 import Tkinter as tk
+from matplotlib import cm
+from skimage.util import img_as_float
+from skimage.color import gray2rgb
 from cellpicker import CellPicker
 
 
@@ -46,8 +49,6 @@ class FRETManager(object):
         cell_average_donor = []
         cell_average_acceptor = []
         cell_average_fret = []
-
-        print "started auto-fluorescence"
 
         for key in self.wt_cells:
             x0, y0, x1, y1 = cells_manager.cells[key].box
@@ -157,37 +158,43 @@ class FRETManager(object):
         """autofluorescence is removed px by px using the previous computed average.
         if the subtracted value is less than zero, the px is assumed to have no signal and is not computed"""
 
-        print "correction"
-
         self.compute_ab(image_manager, cells_manager)
         self.compute_cd(image_manager, cells_manager)
 
-    def close_input(self, window_object, input_object):
+    def close_input_e(self, window_object, input_object):
 
         self.fret_E = float(input_object.get())
         window_object.quit()
         window_object.destroy()
 
+    def close_input_g(self, window_object, input_object):
+
+        self.fret_G = float(input_object.get())
+        window_object.quit()
+        window_object.destroy()
+
     def get_E_value(self):
+        print "Choose E value"
         window = tk.Tk()
 
         e_label = tk.Label(text="Enter E value:")
         e_label.pack(side="top")
         e_input = tk.Entry()
         e_input.pack(side="top")
-        submit_button = tk.Button(text="Submit", command=lambda: self.close_input(window, e_input))
+        submit_button = tk.Button(text="Submit", command=lambda: self.close_input_e(window, e_input))
         submit_button.pack()
 
         window.mainloop()
 
     def get_G_value(self):
+        print "Choose G value"
         window = tk.Tk()
 
         g_label = tk.Label(text="Enter G value:")
         g_label.pack(side="top")
         g_input = tk.Entry()
         g_input.pack(side="top")
-        submit_button = tk.Button(text="Submit", command=lambda: self.close_input(window, g_input))
+        submit_button = tk.Button(text="Submit", command=lambda: self.close_input_g(window, g_input))
         submit_button.pack()
 
         window.mainloop()
@@ -230,13 +237,16 @@ class FRETManager(object):
                 g_values.append(((1-self.fret_E)*Fc)/(self.fret_E*Idd))
 
             if len(g_values) > 0:
-                cell_average_g.append(np.average(g_values))
+                average = np.average(g_values)
+                cell_average_g.append(average)
+                cells_manager.cells[key].stats["G"] = average
+            else:
+                cells_manager.cells[key].stats["G"] = average
 
         self.fret_G = np.median(cell_average_g)
 
     def compute_fret_efficiency(self, image_manager, cells_manager):
-        # TODO create heatmap here
-
+        
         heatmap = np.zeros(image_manager.phase_image.shape)
 
         print "computing E"
@@ -281,7 +291,11 @@ class FRETManager(object):
                 heatmap[x0+x, y0+y] = e
 
             if len(e_values) > 0:
-                cell_average_E.append(np.average(e_values))
+                average = np.average(e_values)
+                cell_average_E.append(average)
+                cells_manager.cells[key].stats["Cell E"] = average
+            else:
+                cells_manager.cells[key].stats["Cell E"] = 0
 
             x0, y0, x1, y1 = cells_manager.cells[key].box
             sept_mask = cells_manager.cells[key].sept_mask
@@ -312,12 +326,27 @@ class FRETManager(object):
 
                 e = (Fc/self.fret_G) / (Idd+(Fc/self.fret_G))
                 e_values.append(e)
-                """x, y = ix
-                heatmap[x+x0, y+y0] = e"""
 
             if len(e_values) > 0:
-                septum_average_E.append(np.average(e_values))
+                average = np.average(e_values)
+                septum_average_E.append(average)
+                cells_manager.cells[key].stats["Septum E"] = average
+            else:
+                cells_manager.cells[key].stats["Septum E"] = 0
+
+            phase_img = image_manager.phase_image
+            phase_img = img_as_float(gray2rgb(phase_img))
+
+            ht_ix = np.nonzero(heatmap)
+            ht_ix = zip(list(ht_ix[0]), list(ht_ix[1]))
+            min_val = np.min(heatmap)
+            max_val = np.max(heatmap)
+
+            for ix in ht_ix:
+                cm_ix = int(((heatmap[ix] + np.sqrt(min_val*min_val))*256) / (max_val + np.sqrt(min_val*min_val)))
+                phase_img[ix] = np.array(cm.bwr(cm_ix)[:3])
+
 
         self.cell_E = np.median(cell_average_E)
         self.septum_E = np.median(septum_average_E)
-        self.fret_heatmap = heatmap
+        self.fret_heatmap = phase_img

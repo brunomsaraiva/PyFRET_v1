@@ -125,5 +125,5 @@ class SetManager(object):
     def compute_fret_efficiency(self):
         self.fret_manager.compute_fret_efficiency(self.image_manager, self.cells_manager)
 
-    def generate_report(self, setname, image_manager, cells_manager, fret_manager):
-        self.reports_manager.generate_report(setname, image_manager, cells_manager, fret_manager)
+    def generate_report(self, channel):
+        self.reports_manager.generate_report(channel, self.image_manager, self.cells_manager, self.fret_manager)

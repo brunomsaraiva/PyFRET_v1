@@ -24,7 +24,7 @@ class ImageManager(object):
     def load_phase_image(self, path=None, border=10):
 
         if path is None:
-            image_path = tkFileDialog.askopenfilename()
+            image_path = tkFileDialog.askopenfilename(title="Load Phase Image")
         else:
             image_path = path
 
@@ -112,7 +112,7 @@ class ImageManager(object):
         x0, y0, x1, y1 = self.clip
 
         if path is None:
-            image_path = tkFileDialog.askopenfilename()
+            image_path = tkFileDialog.askopenfilename(title="Load " + channel + " Image")
         else:
             image_path = path
 
