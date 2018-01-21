@@ -315,7 +315,11 @@ class ReportsManager(object):
         
         open(path + os.sep + "html_report.html", "w").writelines(report)
 
-    def generate_report(self, setname, image_manager, cells_manager, fret_manager, path=None):
+    def generate_report(self, setname, set_manager, path=None):
+
+        image_manager = set_manager.image_manager
+        cells_manager = set_manager.cells_manager
+        fret_manager = set_manager.fret_manager
 
         if path is None:
             path = tkFileDialog.askdirectory()

@@ -21,6 +21,7 @@ class PyFRET(object):
         self.sets["Control"].process_cells()
         self.sets["Control"].pick_channel()
         self.sets["Control"].compute_autofluorescence()
+        self.sets["Control"].compute_correction_factors()
         self.sets["Control"].compute_g()
         self.generate_report("Control", self.sets["Control"])
 
@@ -35,6 +36,7 @@ class PyFRET(object):
         self.sets["Experiment"].process_cells()
         self.sets["Experiment"].pick_channel()
         self.sets["Experiment"].compute_autofluorescence()
+        self.sets["Experiment"].compute_correction_factors()
         self.sets["Experiment"].compute_fret_efficiency()
         self.generate_report("Experiment", self.sets["Experiment"])
 
