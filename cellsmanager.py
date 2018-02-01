@@ -55,8 +55,10 @@ class Cell(object):
                                   ("Baseline Acceptor", 0),
                                   ("Baseline FRET", 0),
                                   ("G", 0),
+                                  ("Septum G", 0),
                                   ("Cell E", 0),
-                                  ("Septum E", 0)])
+                                  ("Septum E", 0),
+                                  ("Has Septum", False)])
 
         self.selection_state = 1
 
@@ -101,8 +103,10 @@ class Cell(object):
                                   ("Baseline Acceptor", 0),
                                   ("Baseline FRET", 0),
                                   ("G", 0),
+                                  ("Septum G", 0),
                                   ("Cell E", 0),
-                                  ("Septum E", 0)])
+                                  ("Septum E", 0),
+                                  ("Has Septum", False)])
 
         self.selection_state = 1
 

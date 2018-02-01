@@ -62,6 +62,7 @@ def bound_rectangle(points):
 def stats_format(params):
     """Returns the list of cell stats to be displayed on the report,
     depending on the computation of the septum"""
+    #TODO need to refactor this method
     result = []
     result.append(('Area', 0))
     result.append(('Perimeter', 0))
@@ -74,8 +75,10 @@ def stats_format(params):
     result.append(('Baseline Acceptor', 4))
     result.append(('Baseline FRET', 4))
     result.append(('G', 4))
+    result.append(('Septum G', 4))
     result.append(('Cell E', 4))
     result.append(('Septum E', 4))
+    result.append(('Has Septum', 4))
 
     return result
 

@@ -81,10 +81,10 @@ class CellPicker(object):
         self.label_text.set("No Cells Selected")
         self.number_of_cells_label = tk.Label(
             self.top_frame, textvariable=self.label_text)
-        self.number_of_cells_label.pack()
+        self.number_of_cells_label.pack(side="top", fill="x")
 
         # creates the figure canvas
-        self.fig = plt.figure(figsize=(10, 6), frameon=True)
+        self.fig = plt.figure(figsize=(6, 4), frameon=True)
         self.canvas = FigureCanvasTkAgg(self.fig, self.middle_frame)
         self.canvas.show()
         self.canvas.get_tk_widget().pack(side="top")
@@ -142,6 +142,10 @@ class CellPicker(object):
 
         self.cells_manager.cells[self.cells_id[self.current_index]].channel = channel
         self.cells_manager.cells[self.cells_id[self.current_index]].has_septum = has_septum
+        if has_septum:
+            self.cells_manager.cells[self.cells_id[self.current_index]].stats["Has Septum"] = 1
+        else:
+            self.cells_manager.cells[self.cells_id[self.current_index]].stats["Has Septum"] = 0
 
         if self.current_index < len(self.cells_id)-1:
             self.current_index += 1

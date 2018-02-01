@@ -17,6 +17,7 @@ class ReportsManager(object):
         
         cells = cells_manager.cells
         g_value = fret_manager.fret_G
+        septum_g_value = fret_manager.fret_septum_G
         e_value = fret_manager.fret_E
 
         HTML_HEADER = """<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
@@ -36,6 +37,8 @@ class ReportsManager(object):
         report.extend(e_report)
         g_report = "<h2>Average G value: " + str(g_value) + "</h2>"
         report.extend(g_report)
+        g_septum_report = "<h2>Average Septum G value: " + str(septum_g_value) + "</h2>"
+        report.extend(g_septum_report)
 
         if len(cells) > 0:
             header = '<table>\n<th>Cell ID</th><th>Images'

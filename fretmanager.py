@@ -19,12 +19,17 @@ class FRETManager(object):
         self.autofluorescence_fret = None
 
         self.fret_a = None
+        self.fret_septum_a = None
         self.fret_b = None
+        self.fret_septum_b = None
         self.fret_c = None
+        self.fret_septum_c = None
         self.fret_d = None
+        self.fret_septum_d = None
 
         self.fret_E = None
         self.fret_G = None
+        self.fret_septum_G = None
 
         self.cell_E = None
         self.septum_E = None
@@ -73,10 +78,12 @@ class FRETManager(object):
     def compute_ab(self, image_manager, cells_manager):
         cell_average_a = []
         cell_average_b = []
+        septum_average_a = []
+        septum_average_b = []
 
-        for key in self.donor_cells:
+        for key in self.acceptor_cells:
             x0, y0, x1, y1 = cells_manager.cells[key].box
-            cell_mask = cells_manager.cells[key].cell_mask
+            cell_mask = cells_manager.cells[key].cell_mask            
 
             donor_cell_image = image_manager.donor_image[x0:x1+1, y0:y1+1] * cell_mask
             donor_cell_image = donor_cell_image - self.autofluorescence_donor - cells_manager.cells[key].stats["Baseline Donor"]
@@ -109,14 +116,53 @@ class FRETManager(object):
             if len(b_values) > 0:
                 cell_average_b.append(np.average(b_values))
 
+            if cells_manager.cells[key].has_septum:
+                x0, y0, x1, y1 = cells_manager.cells[key].box
+                cell_mask = cells_manager.cells[key].sept_mask
+
+                donor_cell_image = image_manager.donor_image[x0:x1+1, y0:y1+1] * cell_mask
+                donor_cell_image = donor_cell_image - self.autofluorescence_donor - cells_manager.cells[key].stats["Baseline Donor"]
+                donor_cell_image = donor_cell_image * (donor_cell_image > 0)
+                nonzero_donor = np.nonzero(donor_cell_image)
+
+                acceptor_cell_image = image_manager.acceptor_image[x0:x1+1, y0:y1+1] * cell_mask
+                acceptor_cell_image = acceptor_cell_image - self.autofluorescence_acceptor - cells_manager.cells[key].stats["Baseline Acceptor"]
+                acceptor_cell_image = acceptor_cell_image * (acceptor_cell_image > 0)
+                nonzero_acceptor = np.nonzero(acceptor_cell_image)
+
+                fret_cell_image = image_manager.fret_image[x0:x1+1, y0:y1+1] * cell_mask
+                fret_cell_image = fret_cell_image - self.autofluorescence_fret - cells_manager.cells[key].stats["Baseline FRET"]
+                fret_cell_image = fret_cell_image * (fret_cell_image > 0)
+                nonzero_fret = np.nonzero(fret_cell_image)
+
+                a_ix = list(set(zip(list(nonzero_fret[0]), list(nonzero_fret[1]))).intersection(zip(list(nonzero_acceptor[0]), list(nonzero_acceptor[1]))))
+
+                a_values = []
+                for ix in a_ix:
+                    a_values.append(fret_cell_image[ix]/acceptor_cell_image[ix])
+                if len(a_values) > 0:
+                    septum_average_a.append(np.average(a_values))
+
+                b_ix = list(set(zip(list(nonzero_donor[0]), list(nonzero_donor[1]))).intersection(zip(list(nonzero_acceptor[0]), list(nonzero_acceptor[1]))))
+
+                b_values = []
+                for ix in b_ix:
+                    b_values.append(donor_cell_image[ix]/acceptor_cell_image[ix])
+                if len(b_values) > 0:
+                    septum_average_b.append(np.average(b_values))
+
         self.fret_a = np.median(cell_average_a)
+        self.fret_septum_a = np.median(septum_average_a)
         self.fret_b = np.median(cell_average_b)
+        self.fret_septum_b = np.median(septum_average_b)
 
     def compute_cd(self, image_manager, cells_manager):
         cell_average_c = []
+        septum_average_c = []
         cell_average_d = []
+        septum_average_d = []
 
-        for key in self.acceptor_cells:
+        for key in self.donor_cells:
             x0, y0, x1, y1 = cells_manager.cells[key].box
             cell_mask = cells_manager.cells[key].cell_mask
 
@@ -147,12 +193,49 @@ class FRETManager(object):
 
             d_values = []
             for ix in d_ix:
-                d_values.append(fret_cell_image[ix]/acceptor_cell_image[ix])
+                d_values.append(fret_cell_image[ix]/donor_cell_image[ix])
             if len(d_values) > 0:
                 cell_average_d.append(np.average(d_values))
 
+            if cells_manager.cells[key].has_septum:
+                x0, y0, x1, y1 = cells_manager.cells[key].box
+                cell_mask = cells_manager.cells[key].sept_mask
+
+                donor_cell_image = image_manager.donor_image[x0:x1+1, y0:y1+1] * cell_mask
+                donor_cell_image = donor_cell_image - self.autofluorescence_donor - cells_manager.cells[key].stats["Baseline Donor"]
+                donor_cell_image = donor_cell_image * (donor_cell_image > 0)
+                nonzero_donor = np.nonzero(donor_cell_image)
+
+                acceptor_cell_image = image_manager.acceptor_image[x0:x1+1, y0:y1+1] * cell_mask
+                acceptor_cell_image = acceptor_cell_image - self.autofluorescence_acceptor - cells_manager.cells[key].stats["Baseline Acceptor"]
+                acceptor_cell_image = acceptor_cell_image * (acceptor_cell_image > 0)
+                nonzero_acceptor = np.nonzero(acceptor_cell_image)
+
+                fret_cell_image = image_manager.fret_image[x0:x1+1, y0:y1+1] * cell_mask
+                fret_cell_image = fret_cell_image - self.autofluorescence_fret - cells_manager.cells[key].stats["Baseline FRET"]
+                fret_cell_image = fret_cell_image * (fret_cell_image > 0)
+                nonzero_fret = np.nonzero(fret_cell_image)
+
+                c_ix = list(set(zip(list(nonzero_acceptor[0]), list(nonzero_acceptor[1]))).intersection(zip(list(nonzero_donor[0]), list(nonzero_donor[1]))))
+
+                c_values = []
+                for ix in c_ix:
+                    c_values.append(acceptor_cell_image[ix]/donor_cell_image[ix])
+                if len(c_values) > 0:
+                    septum_average_c.append(np.average(c_values))
+
+                d_ix = list(set(zip(list(nonzero_fret[0]), list(nonzero_fret[1]))).intersection(zip(list(nonzero_acceptor[0]), list(nonzero_acceptor[1]))))
+
+                d_values = []
+                for ix in d_ix:
+                    d_values.append(fret_cell_image[ix]/donor_cell_image[ix])
+                if len(d_values) > 0:
+                    septum_average_d.append(np.average(d_values))
+
         self.fret_c = np.median(cell_average_c)
+        self.fret_septum_c = np.median(septum_average_c)
         self.fret_d = np.median(cell_average_d)
+        self.fret_septum_d = np.median(septum_average_d)
 
     def compute_correction_factors(self, image_manager, cells_manager):
         """autofluorescence is removed px by px using the previous computed average.
@@ -204,8 +287,7 @@ class FRETManager(object):
             self.get_E_value()
 
         cell_average_g = []
-
-        print "computing G"
+        septum_average_g = []
 
         for key in self.both_cells:
             x0, y0, x1, y1 = cells_manager.cells[key].box
@@ -226,7 +308,7 @@ class FRETManager(object):
             fret_cell_image = fret_cell_image * (fret_cell_image > 0)
             nonzero_fret = np.nonzero(fret_cell_image)
 
-            # TODO discuss if we shoudld use this pixels anyway
+            # TODO discuss if we shoudld use these pixels anyway
             nonzero_ix = list(set(zip(list(nonzero_acceptor[0]), list(nonzero_acceptor[1]))).intersection(zip(list(nonzero_donor[0]), list(nonzero_donor[1]))).intersection(zip(list(nonzero_fret[0]), list(nonzero_fret[1]))))
 
             g_values = []
@@ -234,16 +316,63 @@ class FRETManager(object):
                 Iaa = (self.fret_d * acceptor_cell_image[ix] - self.fret_c * fret_cell_image[ix]) / (self.fret_d - self.fret_c * self.fret_a)
                 Idd = (self.fret_a * donor_cell_image[ix] - self.fret_b * fret_cell_image[ix]) / (self.fret_a - self.fret_b * self.fret_d)
                 Fc = fret_cell_image[ix] - self.fret_a * Iaa - self.fret_d * Idd
-                g_values.append(((1-self.fret_E)*Fc)/(self.fret_E*Idd))
+                g_value = ((1-self.fret_E)*Fc)/(self.fret_E*Idd)
+                g_values.append(g_value)
+
+                print "a:", self.fret_a
+                print "b: ", self.fret_b
+                print "c: ", self.fret_c
+                print "d: ", self.fret_d
+                print "Idd: ", Idd
+                print "Iaa: ", Iaa
+                print "Fc: ", Fc
 
             if len(g_values) > 0:
                 average = np.average(g_values)
                 cell_average_g.append(average)
                 cells_manager.cells[key].stats["G"] = average
             else:
-                cells_manager.cells[key].stats["G"] = average
+                cells_manager.cells[key].stats["G"] = 0
+
+            if cells_manager.cells[key].has_septum:
+                x0, y0, x1, y1 = cells_manager.cells[key].box
+                cell_mask = cells_manager.cells[key].sept_mask
+
+                donor_cell_image = image_manager.donor_image[x0:x1+1, y0:y1+1] * cell_mask
+                donor_cell_image = donor_cell_image - self.autofluorescence_donor - cells_manager.cells[key].stats["Baseline Donor"]
+                donor_cell_image = donor_cell_image * (donor_cell_image > 0)
+                nonzero_donor = np.nonzero(donor_cell_image)
+
+                acceptor_cell_image = image_manager.acceptor_image[x0:x1+1, y0:y1+1] * cell_mask
+                acceptor_cell_image = acceptor_cell_image - self.autofluorescence_acceptor - cells_manager.cells[key].stats["Baseline Acceptor"]
+                acceptor_cell_image = acceptor_cell_image * (acceptor_cell_image > 0)
+                nonzero_acceptor = np.nonzero(acceptor_cell_image)
+
+                fret_cell_image = image_manager.fret_image[x0:x1+1, y0:y1+1] * cell_mask
+                fret_cell_image = fret_cell_image - self.autofluorescence_fret - cells_manager.cells[key].stats["Baseline FRET"]
+                fret_cell_image = fret_cell_image * (fret_cell_image > 0)
+                nonzero_fret = np.nonzero(fret_cell_image)
+
+                # TODO discuss if we shoudld use this pixels anyway
+                nonzero_ix = list(set(zip(list(nonzero_acceptor[0]), list(nonzero_acceptor[1]))).intersection(zip(list(nonzero_donor[0]), list(nonzero_donor[1]))).intersection(zip(list(nonzero_fret[0]), list(nonzero_fret[1]))))
+
+                g_values = []
+                for ix in nonzero_ix:
+                    Iaa = (self.fret_septum_d * acceptor_cell_image[ix] - self.fret_septum_c * fret_cell_image[ix]) / (self.fret_septum_d - self.fret_septum_c * self.fret_septum_a)
+                    Idd = (self.fret_septum_a * donor_cell_image[ix] - self.fret_septum_b * fret_cell_image[ix]) / (self.fret_septum_a - self.fret_septum_b * self.fret_septum_d)
+                    Fc = fret_cell_image[ix] - self.fret_a * Iaa - self.fret_d * Idd
+                    g_value = ((1-self.fret_E)*Fc)/(self.fret_E*Idd)
+                    g_values.append(g_value)
+
+                if len(g_values) > 0:
+                    average = np.average(g_values)
+                    septum_average_g.append(average)
+                    cells_manager.cells[key].stats["Septum G"] = average
+                else:
+                    cells_manager.cells[key].stats["Septum G"] = 0
 
         self.fret_G = np.median(cell_average_g)
+        self.fret_septum_G = np.median(septum_average_g)
 
     def compute_fret_efficiency(self, image_manager, cells_manager):
         
@@ -321,11 +450,11 @@ class FRETManager(object):
 
                 e_values = []
                 for ix in nonzero_ix:
-                    Iaa = (self.fret_d * acceptor_cell_image[ix] - self.fret_c * fret_cell_image[ix]) / (self.fret_d - self.fret_c * self.fret_a)
-                    Idd = (self.fret_a * donor_cell_image[ix] - self.fret_b * fret_cell_image[ix]) / (self.fret_a - self.fret_b * self.fret_d)
-                    Fc = fret_cell_image[ix] - self.fret_a * Iaa - self.fret_d * Idd
+                    Iaa = (self.fret_septum_d * acceptor_cell_image[ix] - self.fret_septum_c * fret_cell_image[ix]) / (self.fret_septum_d - self.fret_septum_c * self.fret_septum_a)
+                    Idd = (self.fret_septum_a * donor_cell_image[ix] - self.fret_septum_b * fret_cell_image[ix]) / (self.fret_septum_a - self.fret_septum_b * self.fret_septum_d)
+                    Fc = fret_cell_image[ix] - self.fret_septum_a * Iaa - self.fret_septum_d * Idd
 
-                    e = (Fc/self.fret_G) / (Idd+(Fc/self.fret_G))
+                    e = (Fc/self.fret_septum_G) / (Idd+(Fc/self.fret_septum_G))
                     e_values.append(e)
 
                 if len(e_values) > 0:
